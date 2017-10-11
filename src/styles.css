@@ -7343,3 +7343,32 @@ footer .attribution {
   margin-right: 5px;
   cursor: pointer;
 }
+
+form {
+  padding: 30px 20px;
+}
+
+form.form-shaded {
+  background: #eee;
+}
+
+.mat-icon.icon-label {
+  margin-right: 10px;
+}
+
+.mat-form-field {
+  display: block !important;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.pull-right {
+  float: right;
+}
+
+.font-monospace {
+  font-family: 'Roboto Mono', monospace !important;
+  font-size: 13px !important;
+}
