@@ -4,11 +4,20 @@
     <div class="container">
       <img src="/assets/logo-white.svg" width="128" height="128" style="display: block; margin: 0 auto;">
       <h1 class="logo-font">ontoscape</h1>
-      <p>Quality evaluation for ontologies.</p>
+      <p>Quality reports for ontologies.</p>
     </div>
   </div>
 
   <div class="container page">
+    <div class="row">
+      <div class="col-md-9">
+        <form>
+          <mat-form-field>
+            <input name="f1" matInput [(ngModel)]="sourceUrl" required>
+          </mat-form-field>
+        </form>
+      </div>
+    </div>
     <!--
     <div class="row">
       <div class="col-md-9">
