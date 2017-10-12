@@ -1,5 +1,11 @@
-<layout-header></layout-header>
-
-<router-outlet></router-outlet>
-
-<layout-footer></layout-footer>
+<div class="flex-container" fxLayout="column" fxLayout.xs="column" fxLayoutAlign="start top" fxLayoutAlign.xs="start">
+  <div class="flex-item">
+    <layout-header></layout-header>
+  </div>
+  <div class="flex-item" fxFlex>
+    <router-outlet></router-outlet>
+  </div>
+  <div class="flex-item">
+    <layout-footer></layout-footer>
+  </div>
+</div>

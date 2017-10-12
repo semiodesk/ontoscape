@@ -1,15 +1,6 @@
-<div class="home-page">
-
-  <div class="banner" *showAuthed="false">
-    <div class="container">
-      <img src="/assets/logo-white.svg" width="128" height="128" style="display: block; margin: 0 auto;">
-      <h1 class="logo-font">ontoscape</h1>
-      <p>Quality management for ontologies.</p>
-    </div>
-  </div>
-
-  <div class="container page">
-    <mat-tab-group selectedIndex="1">
+<section>
+  <div class="container">
+    <mat-tab-group>
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="icon-label">public</mat-icon> URL
@@ -59,23 +50,43 @@
               </mat-form-field>
               <div class="text-align: right;">
                 <button mat-fab color="primary" (click)="validateData()">
-                  <mat-icon>play_arrow</mat-icon>
-                </button>
+                        <mat-icon>play_arrow</mat-icon>
+                      </button>
               </div>
             </div>
           </div>
         </form>
       </mat-tab>
     </mat-tab-group>
-    <div class="text-center">
-      <mat-spinner *ngIf="isValidating"></mat-spinner>
-      <mat-list>
-        <mat-list-item *ngFor="let result of reportResults">
-          <h4>{{result.severity}} - {{result.focusNode}}</h4>
-          <p>{{result.path}}</p>
-          <p>{{result.message}}</p>
-        </mat-list-item>
-      </mat-list>
+  </div>
+</section>
+<section>
+  <div class="container">
+    <mat-spinner *ngIf="isValidating" style="margin: 10px auto;"></mat-spinner>
+    <div *ngIf="isValidating === false">
+      <div *ngIf="isValidationSuccess">
+        <div class="alert alert-success text-center" role="alert">
+          <div class="flex-middle">
+            <mat-icon class="margin">done</mat-icon><span>Successfully validated document.</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!isValidationSuccess">
+        <div class="alert alert-warning text-center" role="alert">
+          <div class="flex-middle">
+            <mat-icon class="margin">error_outline</mat-icon><span>Document has {{reportResults.length}} issues.</span>
+          </div>
+        </div>
+        <mat-list>
+          <mat-list-item *ngFor="let result of reportResults">
+            <mat-icon matListIcon>error_outline</mat-icon>
+            <h5 matLine>{{result.severity}} - {{result.focusNode}}</h5>
+            <p matLine>{{result.path}}</p>
+            <p matLine>{{result.message}}</p>
+          </mat-list-item>
+        </mat-list>
+      </div>
     </div>
   </div>
-</div>
+</section>

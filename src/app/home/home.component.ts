@@ -1,21 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Headers, Http, Response } from '@angular/http';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs/Rx';
+import { Observable, Subject  } from 'rxjs/Rx';
 import { Ruleset } from '../shared';
 
-declare var $rdf: any;
 declare var SHACLValidator: any;
 
 @Component({
-  selector: 'home-page',
+  selector: 'home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
   constructor(
     private http: Http,
-    private router: Router
+    private router: Router,
+    private detector: ChangeDetectorRef
   ) { }
 
   mimeTypes: Array<string> = [
@@ -37,55 +37,65 @@ export class HomeComponent implements OnInit {
   sourceUrl: string = 'http://dublincore.org/2012/06/14/dcterms.ttl';
   sourceData: string = '';
 
-  isValidating: boolean = false;
+  validator: any = new SHACLValidator();
+  isValidating: boolean = null;
   isValidationSuccess: boolean = false;
 
   reportConforms: boolean = false;
   reportResults: any[];
 
-  ngOnInit() {
-  }
-
-  downloadFile(url: string): Observable<any> {
+  downloadFile(url: string, useProxy: boolean = false): Observable<any> {
     var headers = new Headers({
       'Accept': this.mimeTypes
     });
 
     console.log('Downloading file: ', url);
 
-    return this.http.get(url, { headers: headers }).catch(this.formatErrors);
+    return this.http.get(useProxy ? 'http://cors-proxy.htmldriven.com/?url=' + url : url, { headers: headers })
+      .catch(this.formatErrors)
+      .map(res => useProxy ? res.json() : res);
   }
 
   validateRuleset(data: string, rules: string) {
-    var self = this;
-    var validator = new SHACLValidator();
+    console.info('Validating data:');
+    console.info(data);
 
     console.info('Validating SHACL:');
     console.info(rules);
 
-    validator.validate(data, "text/turtle", rules, "text/turtle", function (e, report) {
-      self.reportConforms = report.conforms()
+    // The reference to 'this' is lost when invoking the JS validate function.
+    var t = this;
 
-      console.info("Conforms: " + self.reportConforms);
-
-      if (self.reportConforms === false) {
-        var R = [];
-
-        report.results().forEach(function (result) {
-          R.push({
-            severity: result.severity(),
-            focusNode: result.focusNode(),
-            path: result.path(),
-            message: result.message()
-          })
-        });
-
-        self.reportResults = R;
-      }
-
-      self.isValidating = false;
-      self.isValidationSuccess = self.reportConforms;
+    this.validator.validate(data, "text/turtle", rules, "text/turtle", function(e, report) {
+      t.handleValidationResult(e, report);
     });
+  }
+
+  handleValidationResult(e, report) {
+    this.reportConforms = report.conforms();
+
+    console.info("Conforms: " + this.reportConforms);
+
+    if (this.reportConforms === false) {
+      var R = [];
+
+      report.results().forEach(function (result) {
+        R.push({
+          severity: result.severity(),
+          focusNode: result.focusNode(),
+          path: result.path(),
+          message: result.message()
+        })
+      });
+
+      this.reportResults = R;
+    }
+
+    this.isValidating = false;
+    this.isValidationSuccess = this.reportConforms;
+
+    // Udpate the bindings in the UI.
+    this.detector.detectChanges();
   }
 
   validateUrl() {
@@ -95,11 +105,23 @@ export class HomeComponent implements OnInit {
     if (this.sourceUrl) {
       console.info('Downloading source file: ', this.sourceUrl);
 
-      this.downloadFile(this.sourceUrl).subscribe(
+      this.downloadFile(this.sourceUrl, true).subscribe(
         data => {
-          console.log(data);
+          console.info(data);
+          
+          this.sourceData = data.body;
 
-          this.validateRuleset(data, '');
+          this.downloadFile(this.selectedRuleset).subscribe(
+            data => {
+              this.validateRuleset(this.sourceData, data.text());
+            },
+            err => {
+              console.error('Error when downloading file: ', err);
+
+              this.isValidating = false;
+              this.isValidationSuccess = false;
+            }
+          );
         },
         err => {
           this.isValidating = false;
@@ -121,9 +143,7 @@ export class HomeComponent implements OnInit {
     if (this.sourceData && this.sourceData !== '') {
       this.downloadFile(this.selectedRuleset).subscribe(
         data => {
-          var shacl = data.text();
-
-          this.validateRuleset(this.sourceData, shacl);
+          this.validateRuleset(this.sourceData, data.text());
 
           this.isValidating = false;
           this.isValidationSuccess = true;
@@ -141,12 +161,6 @@ export class HomeComponent implements OnInit {
       this.isValidating = false;
       this.isValidationSuccess = false;
     }
-  }
-
-  private isAbsoluteUrl(url: string) {
-    var expression = /^https?:\/\//i;
-
-    return expression.test(url);
   }
 
   private formatErrors(error: any) {

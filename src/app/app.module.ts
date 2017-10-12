@@ -5,26 +5,15 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
+import { MaterialModule } from './material';
 import { AppComponent } from './app.component';
-import { ArticleModule } from './article/article.module';
-import { AuthModule } from './auth/auth.module';
-import { EditorModule } from './editor/editor.module';
 import { HomeModule } from './home/home.module';
-import { ProfileModule } from './profile/profile.module';
-import { SettingsModule } from './settings/settings.module';
 import {
-  ApiService,
-  ArticlesService,
-  AuthGuard,
-  CommentsService,
   FooterComponent,
   HeaderComponent,
-  JwtService,
-  ProfilesService,
-  SharedModule,
-  TagsService,
-  UserService
+  SharedModule
 } from './shared';
 
 const rootRouting: ModuleWithProviders = RouterModule.forRoot([], { useHash: true });
@@ -36,28 +25,17 @@ const rootRouting: ModuleWithProviders = RouterModule.forRoot([], { useHash: tru
     HeaderComponent
   ],
   imports: [
+    MaterialModule,
+    FlexLayoutModule,
     BrowserModule,
     BrowserAnimationsModule,
     CommonModule,
     FormsModule,
-    ArticleModule,
-    AuthModule,
-    EditorModule,
     HomeModule,
-    ProfileModule,
     rootRouting,
-    SharedModule,
-    SettingsModule,
+    SharedModule
   ],
   providers: [
-    ApiService,
-    ArticlesService,
-    AuthGuard,
-    CommentsService,
-    JwtService,
-    ProfilesService,
-    TagsService,
-    UserService
   ],
   bootstrap: [AppComponent]
 })

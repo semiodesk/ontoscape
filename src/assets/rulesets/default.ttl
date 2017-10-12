@@ -4,24 +4,38 @@
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
-@prefix os: <http://ontoscape.org/2017/10/ruleset#> .
+@prefix : <http://ontoscape.org/2017/10/ruleset#> .
 
-os:ClassShape a sh:NodeShape ;
-    sh:targetClass rdfs:Class ;
-    sh:targetClass owl:Class ;
+:OntologyShape a sh:NodeShape;
     sh:property [
-        sh:path rdfs:label ;
-        sh:minCount 1 ;
+        sh:path dcterms:title;
         sh:nodeKind sh:Literal;
+        sh:minCount 1;
+        sh:minLength 1;
+        sh:uniqueLang 1;
+    ] ;
+.
+
+:ClassShape a sh:NodeShape ;
+    sh:targetClass rdfs:Class;
+    sh:targetClass owl:Class;
+    sh:property [
+        sh:path rdfs:label;
+        sh:nodeKind sh:Literal;
+        sh:minCount 1;
+        sh:minLength 1;
+        sh:uniqueLang 1;
     ] ;
     sh:property [
-        sh:path rdfs:comment ;
-        sh:minCount 1 ;
+        sh:path rdfs:comment;
         sh:nodeKind sh:Literal;
+        sh:minCount 1;
+        sh:minLength 1;
+        sh:uniqueLang 1;
     ] ;
     sh:property [
-        sh:path rdfs:isDefinedBy ;
-        sh:minCount 1 ;
-        sh:nodeKind sh:IRI;
+        sh:path rdfs:isDefinedBy;
+        sh:node :OntologyShape;
+        sh:minCount 1;
     ] ;
 .
